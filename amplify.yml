@@ -12,8 +12,8 @@ frontend:
         # Step 3: Extract Dart Sass
         - tar -xzf dart-sass-$DART_SASS_VERSION-linux-x64.tar.gz
 
-        # Step 4: Rename the extracted directory to ./dart-sass
-        - mv dart-sass ./dart-sass
+        # Step 4: Rename the extracted directory to ./dart-sass (avoid conflicts)
+        - mv dart-sass/* ./dart-sass/
 
         # Step 5: Add Dart Sass to PATH
         - export PATH=$PATH:$(pwd)/dart-sass
