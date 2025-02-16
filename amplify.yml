@@ -1,60 +1,37 @@
 version: 1
-env:
-  variables:
-    # Application versions
-    DART_SASS_VERSION: 1.81.0
-    GO_VERSION: 1.23.3
-    HUGO_VERSION: 0.139.3
-    # Time zone
-    TZ: America/Los_Angeles
-    # Cache
-    HUGO_CACHEDIR: ${PWD}/.hugo
-    NPM_CONFIG_CACHE: ${PWD}/.npm
 frontend:
   phases:
     preBuild:
       commands:
-        # Install Dart Sass
-        - curl -LJO https://github.com/sass/dart-sass/releases/download/${DART_SASS_VERSION}/dart-sass-${DART_SASS_VERSION}-linux-x64.tar.gz
-        - tar -xzf dart-sass-${DART_SASS_VERSION}-linux-x64.tar.gz
-        - mv dart-sass /usr/local/bin/dart-sass
-        - rm dart-sass-${DART_SASS_VERSION}-linux-x64.tar.gz
-        - export PATH=/usr/local/bin/dart-sass:$PATH
+        # Step 1: Define the Dart Sass version
+        - DART_SASS_VERSION=1.55.0
 
-        # Install Go
-        - curl -LJO https://go.dev/dl/go${GO_VERSION}.linux-amd64.tar.gz
-        - sudo tar -C /usr/local -xf go${GO_VERSION}.linux-amd64.tar.gz
-        - rm go${GO_VERSION}.linux-amd64.tar.gz
-        - export PATH=/usr/local/go/bin:$PATH
+        # Step 2: Download Dart Sass
+        - wget https://github.com/sass/dart-sass/releases/download/$DART_SASS_VERSION/dart-sass-$DART_SASS_VERSION-linux-x64.tar.gz
 
-        # Install Hugo
-        - curl -LJO https://github.com/gohugoio/hugo/releases/download/v${HUGO_VERSION}/hugo_extended_${HUGO_VERSION}_linux-amd64.tar.gz
-        - tar -xzf hugo_extended_${HUGO_VERSION}_linux-amd64.tar.gz
-        - chmod +x hugo
-        - sudo mv hugo /usr/local/bin/hugo
-        - rm hugo_extended_${HUGO_VERSION}_linux-amd64.tar.gz
-        - export PATH=/usr/local/bin:$PATH
+        # Step 3: Extract Dart Sass
+        - tar -xzf dart-sass-$DART_SASS_VERSION-linux-x64.tar.gz
 
-        # Check installed versions
-        - go version
-        - hugo version
-        - node -v
-        - npm -v
-        - sass --embedded --version
+        # Step 4: Move Dart Sass to a local directory
+        - mkdir -p ./dart-sass
+        - mv dart-sass/* ./dart-sass/
 
-        # Install Node.JS dependencies (optional, remove if not needed)
-        - "[[ -f package-lock.json || -f npm-shrinkwrap.json ]] && npm ci --prefer-offline || true"
+        # Step 5: Add Dart Sass to PATH
+        - export PATH=$PATH:$(pwd)/dart-sass
 
-        # Fix for Hugo issue: https://github.com/gohugoio/hugo/issues/9810
-        - git config --add core.quotepath false
+        # Step 6: Install project dependencies (if any)
+        - npm install
+
     build:
       commands:
-        - hugo --gc --minify --source .
+        # Build your Hugo site
+        - hugo --gc --minify
+
   artifacts:
     baseDirectory: public
     files:
       - '**/*'
+
   cache:
     paths:
-      - ${HUGO_CACHEDIR}/**/*
-      - ${NPM_CONFIG_CACHE}/**/*
+      - node_modules/**/*
