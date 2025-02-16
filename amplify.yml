@@ -12,13 +12,17 @@ frontend:
         # Step 3: Extract Dart Sass
         - tar -xzf dart-sass-$DART_SASS_VERSION-linux-x64.tar.gz
 
-        # Step 4: Rename the extracted directory to ./dart-sass (avoid conflicts)
+        # Step 4: Clean up the existing ./dart-sass directory (if it exists)
+        - rm -rf ./dart-sass
+
+        # Step 5: Move the contents of the extracted directory into ./dart-sass
+        - mkdir -p ./dart-sass
         - mv dart-sass/* ./dart-sass/
 
-        # Step 5: Add Dart Sass to PATH
+        # Step 6: Add Dart Sass to PATH
         - export PATH=$PATH:$(pwd)/dart-sass
 
-        # Step 6: Install project dependencies (if any)
+        # Step 7: Install project dependencies (if any)
         - npm install
 
     build:
